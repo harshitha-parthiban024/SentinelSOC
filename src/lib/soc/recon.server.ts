@@ -1,3 +1,4 @@
+import https from "https";
 import { connectMongo } from "./mongo.server";
 import { ReconCacheModel } from "./models/ReconCache";
 import type { Incident, ReconSnapshot, Severity, Signal } from "./types";
@@ -40,13 +41,19 @@ type Probe = {
 async function probe(base: string, path: string): Promise<Probe> {
   const started = Date.now();
   try {
-    const res = await fetch(base + path, {
-      method: "GET",
-      redirect: "follow",
-      headers: { "user-agent": UA, accept: "*/*" },
-      signal: AbortSignal.timeout(12_000),
-    });
-    const headers: Record<string, string> = {};
+   const { Agent } = await import("undici");
+
+const res = await fetch(base + path, {
+  method: "GET",
+  redirect: "follow",
+  headers: { "user-agent": UA, accept: "*/*" },
+  signal: AbortSignal.timeout(20_000),
+  dispatcher: new Agent({
+    connect: {
+      family: 4,
+    },
+  }),
+});    const headers: Record<string, string> = {};
     res.headers.forEach((v, k) => {
       headers[k.toLowerCase()] = v;
     });
