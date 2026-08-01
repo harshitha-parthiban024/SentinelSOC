@@ -6,24 +6,104 @@ import type { Incident, ReconSnapshot, Severity, Signal } from "./types";
 export const TARGETS = [
   {
     id: "juice-shop",
-    label: "OWASP Juice Shop (public demo)",
+    label: "OWASP Juice Shop (Public Demo)",
     url: "https://demo.owasp-juice.shop",
   },
   {
     id: "ginandjuice",
-    label: "PortSwigger Gin & Juice Shop (public lab)",
+    label: "PortSwigger Gin & Juice Shop",
     url: "https://ginandjuice.shop",
   },
+  {
+  id: "dvwa",
+  label: "DVWA (Local Docker)",
+  url: "http://localhost:4280",
+  },  {
+    id: "webgoat",
+    label: "OWASP WebGoat",
+    url: "http://localhost:8081/WebGoat",
+  },
+  {
+    id: "webwolf",
+    label: "OWASP WebWolf",
+    url: "http://localhost:9090",
+  },
+  {
+    id: "bwapp",
+    label: "bWAPP",
+    url: "http://localhost/bWAPP",
+  },
+  {
+    id: "mutillidae",
+    label: "OWASP Mutillidae II",
+    url: "http://localhost/mutillidae",
+  },
+  {
+    id: "xvwa",
+    label: "XVWA",
+    url: "http://localhost/xvwa",
+  },
+  {
+    id: "altoro",
+    label: "IBM Altoro Mutual",
+    url: "http://localhost:8080",
+  },
+  {
+    id: "hackazon",
+    label: "Hackazon",
+    url: "http://localhost/hackazon",
+  },
+  {
+    id: "nodegoat",
+    label: "OWASP NodeGoat",
+    url: "http://localhost:4000",
+  },
+  {
+    id: "dvna",
+    label: "Damn Vulnerable Node Application (DVNA)",
+    url: "http://localhost:9090",
+  },
+  {
+    id: "crapi",
+    label: "OWASP crAPI",
+    url: "http://localhost:8888",
+  },
+  {
+    id: "security-shepherd",
+    label: "OWASP Security Shepherd",
+    url: "http://localhost:8080/shepherd",
+  },
 ] as const;
+const PROBE_PATHS: Record<string, string[]> = {
+  "juice-shop": [
+    "/",
+    "/robots.txt",
+    "/ftp",
+    "/rest/admin/application-configuration",
+    "/this-path-should-not-exist-soc-probe",
+  ],
 
-const PROBE_PATHS = [
+  "ginandjuice": [
+    "/",
+    "/robots.txt",
+    "/login",
+    "/register",
+    "/this-path-should-not-exist-soc-probe",
+  ],
+
+  "dvwa": [
+    "/",
+    "/login.php",
+    "/setup.php",
+    "/instructions.php",
+    "/robots.txt",
+  ],
+"webgoat": [
   "/",
+  "/login",
+  "/WebGoat/login",
   "/robots.txt",
-  "/ftp",
-  "/rest/admin/application-configuration",
-  "/this-path-should-not-exist-soc-probe",
-];
-
+],};
 const UA = "SentinelSOC-ReconAgent/1.0 (passive header + metadata probe only)";
 
 type Probe = {
@@ -40,20 +120,16 @@ type Probe = {
 
 async function probe(base: string, path: string): Promise<Probe> {
   const started = Date.now();
+  console.log("Recon probe:", base + path);
   try {
    const { Agent } = await import("undici");
-
-const res = await fetch(base + path, {
-  method: "GET",
-  redirect: "follow",
-  headers: { "user-agent": UA, accept: "*/*" },
-  signal: AbortSignal.timeout(20_000),
-  dispatcher: new Agent({
-    connect: {
-      family: 4,
-    },
-  }),
-});    const headers: Record<string, string> = {};
+   const res = await fetch(base + path, {
+    method: "GET",
+    redirect: "follow",
+    headers: { "user-agent": UA, accept: "*/*" },
+    signal: AbortSignal.timeout(20_000),
+   });
+    const headers: Record<string, string> = {};
     res.headers.forEach((v, k) => {
       headers[k.toLowerCase()] = v;
     });
@@ -107,9 +183,10 @@ function incident(
   };
 }
 
-export async function runRecon(base: string): Promise<ReconSnapshot> {
+export async function runRecon(base: string,targetId: string): Promise<ReconSnapshot> {
   await connectMongo();
-  const results = await Promise.all(PROBE_PATHS.map((p) => probe(base, p)));
+  const paths = PROBE_PATHS[targetId] ?? PROBE_PATHS["juice-shop"];
+  const results = await Promise.all(paths.map((p) => probe(base, p)));
   const byPath = new Map(results.map((r) => [r.path, r]));
   const root = byPath.get("/")!;
 

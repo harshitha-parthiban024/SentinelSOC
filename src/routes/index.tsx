@@ -24,10 +24,77 @@ import { AUTONOMY_LABELS, CONFIDENCE_THRESHOLD } from "@/lib/soc/types";
 import { fetchSocState, pct, severityClass, socControl, time } from "@/lib/soc/client";
 
 const TARGETS = [
-  { id: "juice-shop", label: "OWASP Juice Shop (public demo)", url: "https://demo.owasp-juice.shop" },
-  { id: "ginandjuice", label: "Gin & Juice Shop (PortSwigger lab)", url: "https://ginandjuice.shop" },
+  {
+    id: "juice-shop",
+    label: "OWASP Juice Shop (Public Demo)",
+    url: "https://demo.owasp-juice.shop",
+  },
+  {
+    id: "ginandjuice",
+    label: "PortSwigger Gin & Juice Shop",
+    url: "https://ginandjuice.shop",
+  },
+  {
+  id: "dvwa",
+  label: "DVWA (Local Docker)",
+  url: "http://localhost:4280",
+  },
+  {
+    id: "webgoat",
+    label: "OWASP WebGoat",
+    url: "http://localhost:8081/WebGoat",
+  },
+  {
+    id: "webwolf",
+    label: "OWASP WebWolf",
+    url: "http://localhost:9090",
+  },
+  {
+    id: "bwapp",
+    label: "bWAPP",
+    url: "http://localhost/bWAPP",
+  },
+  {
+    id: "mutillidae",
+    label: "OWASP Mutillidae II",
+    url: "http://localhost/mutillidae",
+  },
+  {
+    id: "xvwa",
+    label: "XVWA",
+    url: "http://localhost/xvwa",
+  },
+  {
+    id: "altoro",
+    label: "IBM Altoro Mutual",
+    url: "http://localhost:8080",
+  },
+  {
+    id: "hackazon",
+    label: "Hackazon",
+    url: "http://localhost/hackazon",
+  },
+  {
+    id: "nodegoat",
+    label: "OWASP NodeGoat",
+    url: "http://localhost:4000",
+  },
+  {
+    id: "dvna",
+    label: "Damn Vulnerable Node Application (DVNA)",
+    url: "http://localhost:9090",
+  },
+  {
+    id: "crapi",
+    label: "OWASP crAPI",
+    url: "http://localhost:8888",
+  },
+  {
+    id: "security-shepherd",
+    label: "OWASP Security Shepherd",
+    url: "http://localhost:8080/shepherd",
+  },
 ];
-
 const STAGES: { id: StageId; label: string }[] = [
   { id: "orchestrator", label: "Orchestrator" },
   { id: "recon", label: "Recon" },

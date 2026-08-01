@@ -60,7 +60,7 @@ export const Route = createFileRoute("/api/soc/run")({
                 payload: {},
               });
 
-              const snapshot = await runRecon(target.url);
+              const snapshot = await runRecon(target.url,target.id);
               await updateConfig({ lastProbeAt: snapshot.probedAt });
               send({ type: "recon", snapshot });
 
